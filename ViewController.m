@@ -24,19 +24,28 @@
     self.noMoveField.canMove = NO;
     self.heightMoveField.heightToKeyboard = 100;
     
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 300, 375, 200)];
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 300, 180, 200)];
     view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:view];
     
     UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(100, 150, 200, 30)];
+    UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(0, 150, 180, 30)];
     field.placeholder = @"我的父视图移动";
     field.borderStyle = UITextBorderStyleRoundedRect;
     [view addSubview:field];
     field.moveView = view;
     
+    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(190, 300, 180, 200)];
+    scrollView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:scrollView];
+    
+    UITextField *field2 = [[UITextField alloc] initWithFrame:CGRectMake(0, 150, 180, 30)];
+    field2.placeholder = @"我的父视图偏移";
+    field2.borderStyle = UITextBorderStyleRoundedRect;
+    [scrollView addSubview:field2];
+    field2.moveView = scrollView;
     // Do any additional setup after loading the view, typically from a nib.
 }
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

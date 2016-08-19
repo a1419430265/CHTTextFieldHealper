@@ -15,6 +15,9 @@ static char heightToKeyboardKey;
 static char initialYKey;
 static char tapGestureKey;
 static char keyboardYKey;
+static char totalHeightKey;
+static char keyboardHeightKey;
+static char hasContentOffsetKey;
 
 @implementation UITextField (CHTHealper)
 @dynamic canMove;
@@ -23,6 +26,9 @@ static char keyboardYKey;
 @dynamic initialY;
 @dynamic tapGesture;
 @dynamic keyboardY;
+@dynamic totalHeight;
+@dynamic keyboardHeight;
+@dynamic hasContentOffset;
 
 + (void)load {
     static dispatch_once_t onceToken;
@@ -76,44 +82,60 @@ static char keyboardYKey;
     self.heightToKeyboard = 10;
     self.canMove = YES;
     self.keyboardY = 0;
+    self.totalHeight = 0;
     self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
 }
 
 - (void)showAction:(NSNotification *)sender {
+    NSLog(@"%@", sender);
     if (!self.canMove) {
         return;
     }
     self.keyboardY = [sender.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].origin.y;
-    [self showKeyboard];
+    self.keyboardHeight = [sender.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
+    [self keyboardDidShow];
 }
 
 - (void)hideAction:(NSNotification *)sender {
     if (!self.canMove || self.keyboardY == 0) {
         return;
     }
-    [self hideKeyBoard];
+    [self hideKeyBoard:0.25];
 }
 
-- (void)showKeyboard {
-    if (self.keyboardY == 0) {
+- (void)keyboardDidShow {
+    if (self.keyboardHeight == 0) {
         return;
     }
     CGFloat fieldYInWindow = [self convertPoint:self.bounds.origin toView:[UIApplication sharedApplication].keyWindow].y;
     CGFloat height = (fieldYInWindow + self.heightToKeyboard + self.frame.size.height) - self.keyboardY;
     CGFloat moveHeight = height > 0 ? height : 0;
+    
     [UIView animateWithDuration:0.25 animations:^{
-        CGRect rect = self.moveView.frame;
-        self.initialY = rect.origin.y;
-        rect.origin.y -= moveHeight;
-        self.moveView.frame = rect;
+        if (self.hasContentOffset) {
+            UIScrollView *scrollView = (UIScrollView *)self.moveView;
+            scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, scrollView.contentOffset.y + moveHeight);
+        } else {
+            CGRect rect = self.moveView.frame;
+            self.initialY = rect.origin.y;
+            rect.origin.y -= moveHeight;
+            self.moveView.frame = rect;
+        }
+        self.totalHeight += moveHeight;
     }];
 }
 
-- (void)hideKeyBoard {
-    [UIView animateWithDuration:0.25 animations:^{
-        CGRect rect = self.moveView.frame;
-        rect.origin.y = self.initialY;
-        self.moveView.frame = rect;
+- (void)hideKeyBoard:(CGFloat)duration {
+    [UIView animateWithDuration:duration animations:^{
+        if (self.hasContentOffset) {
+            UIScrollView *scrollView = (UIScrollView *)self.moveView;
+            scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, scrollView.contentOffset.y - self.totalHeight);
+        } else {
+            CGRect rect = self.moveView.frame;
+            rect.origin.y += self.totalHeight;
+            self.moveView.frame = rect;
+        }
+        self.totalHeight = 0;
     }];
 }
 
@@ -142,7 +164,7 @@ static char keyboardYKey;
     BOOL result = [self newResignFirstResponder];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-    [self hideKeyBoard];
+    [self hideKeyBoard:0];
     return result;
 }
 
@@ -179,6 +201,11 @@ static char keyboardYKey;
 }
 
 - (void)setMoveView:(UIView *)moveView {
+    self.hasContentOffset = NO;
+    if ([moveView isKindOfClass:[UIScrollView class]]) {
+        self.hasContentOffset = YES;
+    }
+    
     objc_setAssociatedObject(self, &moveViewKey, moveView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
@@ -208,6 +235,30 @@ static char keyboardYKey;
 
 - (CGFloat)keyboardY {
     return [objc_getAssociatedObject(self, &keyboardYKey) floatValue];
+}
+
+- (void)setTotalHeight:(CGFloat)totalHeight {
+    objc_setAssociatedObject(self, &totalHeightKey, @(totalHeight), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CGFloat)totalHeight {
+    return [objc_getAssociatedObject(self, &totalHeightKey) floatValue];
+}
+
+- (void)setKeyboardHeight:(CGFloat)keyboardHeight {
+    objc_setAssociatedObject(self, &keyboardHeightKey, @(keyboardHeight), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CGFloat)keyboardHeight {
+    return [objc_getAssociatedObject(self, &keyboardHeightKey) floatValue];
+}
+
+- (void)setHasContentOffset:(BOOL)hasContentOffset {
+    objc_setAssociatedObject(self, &hasContentOffsetKey, @(hasContentOffset), OBJC_ASSOCIATION_ASSIGN);
+}
+
+- (BOOL)hasContentOffset {
+    return [objc_getAssociatedObject(self, &hasContentOffsetKey) boolValue];
 }
 
 @end

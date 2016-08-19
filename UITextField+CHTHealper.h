@@ -24,7 +24,10 @@
 @property (nonatomic, assign) CGFloat heightToKeyboard;
 
 @property (nonatomic, assign, readonly) CGFloat keyboardY;
+@property (nonatomic, assign, readonly) CGFloat keyboardHeight;
 @property (nonatomic, assign, readonly) CGFloat initialY;
+@property (nonatomic, assign, readonly) CGFloat totalHeight;
 @property (nonatomic, strong, readonly) UITapGestureRecognizer *tapGesture;
+@property (nonatomic, assign, readonly) BOOL hasContentOffset;
 
 @end
