@@ -28,7 +28,6 @@
     view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:view];
     
-    UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(100, 150, 200, 30)];
     UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(0, 150, 180, 30)];
     field.placeholder = @"我的父视图移动";
     field.borderStyle = UITextBorderStyleRoundedRect;
