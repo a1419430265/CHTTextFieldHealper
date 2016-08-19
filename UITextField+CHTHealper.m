@@ -87,7 +87,6 @@ static char hasContentOffsetKey;
 }
 
 - (void)showAction:(NSNotification *)sender {
-    NSLog(@"%@", sender);
     if (!self.canMove) {
         return;
     }
@@ -185,7 +184,7 @@ static char hasContentOffsetKey;
 }
 
 - (void)setCanMove:(BOOL)canMove {
-    objc_setAssociatedObject(self, &canMoveKey, @(canMove), OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(self, &canMoveKey, @(canMove), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (BOOL)canMove {
