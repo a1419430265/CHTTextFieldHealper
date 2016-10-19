@@ -192,7 +192,7 @@ static char hasContentOffsetKey;
 }
 
 - (void)setHeightToKeyboard:(CGFloat)heightToKeyboard {
-    objc_setAssociatedObject(self, &heightToKeyboardKey, @(heightToKeyboard), OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(self, &heightToKeyboardKey, @(heightToKeyboard), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (CGFloat)heightToKeyboard {
@@ -253,7 +253,7 @@ static char hasContentOffsetKey;
 }
 
 - (void)setHasContentOffset:(BOOL)hasContentOffset {
-    objc_setAssociatedObject(self, &hasContentOffsetKey, @(hasContentOffset), OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(self, &hasContentOffsetKey, @(hasContentOffset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (BOOL)hasContentOffset {
