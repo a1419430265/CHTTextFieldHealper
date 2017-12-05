@@ -1,14 +1,13 @@
 //
-//  UITextField+CHTPositionChange.m
-//  CHTTextFieldHealper
+//  UITextView+NDJHelper.m
+//  TransportCar
 //
-//  Created by risenb_mac on 16/8/17.
-//  Copyright © 2016年 risenb_mac. All rights reserved.
+//  Created by niudengjun on 2017/11/28.
+//  Copyright © 2017年 amplity. All rights reserved.
 //
 
-#import "UITextField+CHTHealper.h"
+#import "UITextView+NDJHelper.h"
 #import <objc/runtime.h>
-
 static char canMoveKey;
 static char moveViewKey;
 static char heightToKeyboardKey;
@@ -19,7 +18,7 @@ static char totalHeightKey;
 static char keyboardHeightKey;
 static char hasContentOffsetKey;
 
-@implementation UITextField (CHTHealper)
+@implementation UITextView (NDJHelper)
 @dynamic canMove;
 @dynamic moveView;
 @dynamic heightToKeyboard;
@@ -31,25 +30,28 @@ static char hasContentOffsetKey;
 @dynamic hasContentOffset;
 
 + (void)load {
+    
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        SEL systemSel = @selector(initWithFrame:);
-        SEL mySel = @selector(setupInitWithFrame:);
-        [self exchangeSystemSel:systemSel bySel:mySel];
         
-        SEL systemSel2 = @selector(becomeFirstResponder);
-        SEL mySel2 = @selector(newBecomeFirstResponder);
-        [self exchangeSystemSel:systemSel2 bySel:mySel2];
-        
-        SEL systemSel3 = @selector(resignFirstResponder);
-        SEL mySel3 = @selector(newResignFirstResponder);
-        [self exchangeSystemSel:systemSel3 bySel:mySel3];
-        
-        SEL systemSel4 = @selector(initWithCoder:);
-        SEL mySel4 = @selector(setupInitWithCoder:);
-        [self exchangeSystemSel:systemSel4 bySel:mySel4];
+        if(IOS_VERSION >=9){
+            SEL systemSel = @selector(initWithFrame:);
+            SEL mySel = @selector(setupInitWithFrame:);
+            [self exchangeSystemSel:systemSel bySel:mySel];
+            
+            SEL systemSel2 = @selector(becomeFirstResponder);
+            SEL mySel2 = @selector(newBecomeFirstResponder);
+            [self exchangeSystemSel:systemSel2 bySel:mySel2];
+            
+            SEL systemSel3 = @selector(resignFirstResponder);
+            SEL mySel3 = @selector(newResignFirstResponder);
+            [self exchangeSystemSel:systemSel3 bySel:mySel3];
+            
+            SEL systemSel4 = @selector(initWithCoder:);
+            SEL mySel4 = @selector(setupInitWithCoder:);
+            [self exchangeSystemSel:systemSel4 bySel:mySel4];
+        }
     });
-    [super load];
 }
 
 // 交换方法
@@ -87,6 +89,7 @@ static char hasContentOffsetKey;
 }
 
 - (void)showAction:(NSNotification *)sender {
+    NSLog(@"%@", sender);
     if (!self.canMove) {
         return;
     }
@@ -142,9 +145,9 @@ static char hasContentOffsetKey;
     if (self.moveView == nil) {
         self.moveView = [self viewController].view;
     }
-    if (![self.moveView.gestureRecognizers containsObject:self.tapGesture]) {
-        [self.moveView addGestureRecognizer:self.tapGesture];
-    }
+    //    if (![self.moveView.gestureRecognizers containsObject:self.tapGesture]) {
+    //        [self.moveView addGestureRecognizer:self.tapGesture];
+    //    }
     if ([self isFirstResponder] || !self.canMove) {
         return [self newBecomeFirstResponder];
     }
@@ -186,7 +189,7 @@ static char hasContentOffsetKey;
 }
 
 - (void)setCanMove:(BOOL)canMove {
-    objc_setAssociatedObject(self, &canMoveKey, @(canMove), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &canMoveKey, @(canMove), OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (BOOL)canMove {
@@ -194,7 +197,7 @@ static char hasContentOffsetKey;
 }
 
 - (void)setHeightToKeyboard:(CGFloat)heightToKeyboard {
-    objc_setAssociatedObject(self, &heightToKeyboardKey, @(heightToKeyboard), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &heightToKeyboardKey, @(heightToKeyboard), OBJC_ASSOCIATION_RETAIN);
 }
 
 - (CGFloat)heightToKeyboard {
@@ -255,7 +258,7 @@ static char hasContentOffsetKey;
 }
 
 - (void)setHasContentOffset:(BOOL)hasContentOffset {
-    objc_setAssociatedObject(self, &hasContentOffsetKey, @(hasContentOffset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &hasContentOffsetKey, @(hasContentOffset), OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (BOOL)hasContentOffset {
